@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cozy Cafe Notion Dashboard</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts for Cute Rounded Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Quicksand', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Cozy Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #e6dfd5;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #d4c9b9;
+    }
+
+    /* Soft Floating Glows */
+    .glow-soft {
+      box-shadow: 0 10px 30px -10px rgba(224, 168, 153, 0.2);
+    }
+    
+    /* Dynamic Theme Styles */
+    .theme-cafe {
+      --bg-main: #faf6f0;
+      --bg-card: #ffffff;
+      --accent: #d4a373;
+      --accent-light: #fefae0;
+      --accent-dark: #b5835a;
+      --text-main: #4a3e3d;
+      --text-muted: #8c7e7c;
+      --border-color: #f0e6da;
+    }
+    .theme-matcha {
+      --bg-main: #f3f4ed;
+      --bg-card: #ffffff;
+      --accent: #93b1a6;
+      --accent-light: #e0eed2;
+      --accent-dark: #5c8374;
+      --text-main: #2d3b36;
+      --text-muted: #738780;
+      --border-color: #e3ebd9;
+    }
+    .theme-lavender {
+      --bg-main: #f7f4fa;
+      --bg-card: #ffffff;
+      --accent: #bda2ca;
+      --accent-light: #f3ebf6;
+      --accent-dark: #8c6a9b;
+      --text-main: #3d3543;
+      --text-muted: #81748a;
+      --border-color: #eddfe2;
+    }
+    .theme-rose {
+      --bg-main: #faf4f4;
+      --bg-card: #ffffff;
+      --accent: #e0a899;
+      --accent-light: #fbeeed;
+      --accent-dark: #b97a6b;
+      --text-main: #4d3a37;
+      --text-muted: #8f7470;
+      --border-color: #f5e4e2;
+    }
+    .theme-dark-cozy {
+      --bg-main: #1f1a1a;
+      --bg-card: #2d2525;
+      --accent: #d4a373;
+      --accent-light: #3d3131;
+      --accent-dark: #e6b383;
+      --text-main: #f5ebe6;
+      --text-muted: #af9e9a;
+      --border-color: #3d3333;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    .notion-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      transition: all 0.3s ease;
+    }
+    
+    .badge-pastel {
+      background-color: var(--accent-light);
+      color: var(--accent-dark);
+    }
+
+    /* Confetti Canvas overlay */
+    #confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body class="theme-cafe font-sans overflow-x-hidden min-h-screen pb-12">
+
+  <canvas id="confetti"></canvas>
+
+  <!-- Main Multi-pane Layout Container -->
+  <div class="flex flex-col lg:flex-row min-h-screen">
+    
+    <!-- 1. Left Sidebar Navigation -->
+    <aside class="w-full lg:w-64 flex-shrink-0 p-6 border-b lg:border-b-0 lg:border-r border-[var(--border-color)] bg-[var(--bg-card)] transition-colors duration-300">
+      <!-- Workspace Profile Header -->
+      <div class="flex items-center space-x-3 mb-8 cursor-pointer group">
+        <div class="w-10 h-10 rounded-full bg-[var(--accent-light)] flex items-center justify-center text-xl transition-transform group-hover:scale-110">
+          🧸
+        </div>
+        <div>
+          <h2 class="font-bold text-sm tracking-wide uppercase text-[var(--accent-dark)]">Cafe Workspace</h2>
+          <p class="text-xs text-[var(--text-muted)] flex items-center">
+            <span class="inline-block w-2 h-2 rounded-full bg-green-400 mr-1.5 animate-pulse"></span>
+            Cozy Mode Enabled
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Page Search Mock / Navigation Menu -->
+      <nav class="space-y-1.5">
+        <p class="text-[10px] font-bold text-[var(--text-muted)] tracking-wider uppercase mb-2 px-3">Favorites</p>
+        
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 text-sm font-medium transition-all duration-200 badge-pastel">
+          <i data-lucide="home" class="w-4 h-4"></i>
+          <span>☕ Cozy Cafe Hub</span>
+        </button>
+
+        <button onclick="switchTab('habits')" id="nav-habits" class="nav-btn w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 text-sm font-medium transition-all duration-200 text-[var(--text-muted)] hover:bg-[var(--accent-light)] hover:text-[var(--text-main)]">
+          <i data-lucide="calendar" class="w-4 h-4"></i>
+          <span>🍯 Honey Habit Tracker</span>
+        </button>
+
+        <button onclick="switchTab('reading')" id="nav-reading" class="nav-btn w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 text-sm font-medium transition-all duration-200 text-[var(--text-muted)] hover:bg-[var(--accent-light)] hover:text-[var(--text-main)]">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          <span>📚 Cozy Library Log</span>
+        </button>
+
+        <button onclick="switchTab('notes')" id="nav-notes" class="nav-btn w-full text-left px-3 py-2 rounded-lg flex items-center space-x-3 text-sm font-medium transition-all duration-200 text-[var(--text-muted)] hover:bg-[var(--accent-light)] hover:text-[var(--text-main)]">
+          <i data-lucide="sticky-note" class="w-4 h-4"></i>
+          <span>🎨 Creative Sticky Notes</span>
+        </button>
+      </nav>
+
+      <!-- Music Vibe Controller in Sidebar -->
+      <div class="mt-8 pt-6 border-t border-[var(--border-color)]">
+        <div class="p-3.5 rounded-xl bg-[var(--bg-main)] notion-card">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-semibold text-[var(--text-muted)]">Aesthetic Ambient</span>
+            <span id="music-indicator" class="hidden text-xs text-[var(--accent-dark)] animate-bounce font-mono">♪</span>
+          </div>
+          <div class="flex items-center space-x-2.5">
+            <button onclick="toggleMusic()" class="w-8 h-8 rounded-full bg-[var(--accent)] text-white flex items-center justify-center hover:scale-105 transition-transform">
+              <i id="play-icon" data-lucide="play" class="w-4 h-4"></i>
+            </button>
+            <div class="flex-1 overflow-hidden">
+              <p class="text-xs font-medium truncate" id="track-title">Lofi Rain & Cafe Ambience</p>
+              <p class="text-[10px] text-[var(--text-muted)]">Relaxing White Noise</p>
+            </div>
+          </div>
+          <!-- Custom Ambient Audio Elements -->
+          <audio id="ambient-audio" loop src="https://assets.mixkit.co/active_storage/sfx/2433/2433-84.wav"></audio>
+        </div>
+      </div>
+
+      <!-- Quick Themes List -->
+      <div class="mt-8">
+        <p class="text-[10px] font-bold text-[var(--text-muted)] tracking-wider uppercase mb-2 px-3">Palettes</p>
+        <div class="grid grid-cols-5 gap-1.5 px-3">
+          <button onclick="setTheme('cafe')" class="w-6 h-6 rounded-full bg-[#d4a373] border-2 border-white shadow-sm hover:scale-110 transition-transform" title="Warm Cafe"></button>
+          <button onclick="setTheme('matcha')" class="w-6 h-6 rounded-full bg-[#93b1a6] border-2 border-white shadow-sm hover:scale-110 transition-transform" title="Matcha Green"></button>
+          <button onclick="setTheme('lavender')" class="w-6 h-6 rounded-full bg-[#bda2ca] border-2 border-white shadow-sm hover:scale-110 transition-transform" title="Lavender Calm"></button>
+          <button onclick="setTheme('rose')" class="w-6 h-6 rounded-full bg-[#e0a899] border-2 border-white shadow-sm hover:scale-110 transition-transform" title="Rose Quartz"></button>
+          <button onclick="setTheme('dark-cozy')" class="w-6 h-6 rounded-full bg-[#2d2525] border-2 border-white shadow-sm hover:scale-110 transition-transform" title="Warm Dark"></button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- 2. Main Workspace Content Area -->
+    <main class="flex-1 overflow-y-auto">
+      
+      <!-- Aesthetic Page Header with Cover Photo -->
+      <div class="relative w-full h-48 sm:h-56 overflow-hidden bg-slate-200">
+        <img id="cover-image" src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=1600" alt="Notion Cozy Cover" class="w-full h-full object-cover transition-all duration-500">
+        <!-- Floating Cover Changer Button -->
+        <div class="absolute bottom-4 right-4 flex space-x-2">
+          <button onclick="openCoverSelector()" class="bg-black/40 backdrop-blur-md hover:bg-black/60 text-white text-xs px-3 py-1.5 rounded-lg flex items-center space-x-1 transition-colors">
+            <i data-lucide="image" class="w-3.5 h-3.5"></i>
+            <span>Reposition cover</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Icon & Main Page Header Info -->
+      <div class="max-w-4xl mx-auto px-6 sm:px-12 -mt-10 sm:-mt-12 relative z-10">
+        <!-- Emoji Badge with Selector -->
+        <div class="relative inline-block group">
+          <button onclick="openEmojiSelector()" id="current-emoji" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[var(--bg-card)] border-2 border-[var(--border-color)] shadow-md text-4xl sm:text-5xl flex items-center justify-center hover:scale-105 transition-all cursor-pointer">
+            ☕
+          </button>
+          <div class="absolute -bottom-2 -right-2 bg-[var(--accent)] text-white p-1.5 rounded-full shadow-md scale-0 group-hover:scale-100 transition-transform cursor-pointer">
+            <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+          </div>
+        </div>
+
+        <!-- Editable Workspace Title -->
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h1 id="page-title" class="font-serif text-3xl sm:text-4xl font-bold tracking-tight outline-none border-b border-transparent focus:border-[var(--accent)] focus:bg-[var(--bg-card)] rounded px-1 transition-all" contenteditable="true" onblur="savePageTitle()">
+                Cozy Cafe Workspace
+              </h1>
+              <i data-lucide="pencil" class="w-4 h-4 text-[var(--text-muted)] cursor-pointer" onclick="focusPageTitle()"></i>
+            </div>
+            <p class="text-sm text-[var(--text-muted)] mt-1.5">Welcome back! Grab some warm coffee and settle into your custom planner.</p>
+          </div>
+          
+          <!-- Cute Notification Panel -->
+          <div class="p-2 px-3 rounded-lg bg-[var(--accent-light)] text-xs text-[var(--accent-dark)] font-medium flex items-center space-x-2 animate-pulse">
+            <span>✨ May 2026 Space Drafted</span>
+          </div>
+        </div>
+
+        <div class="w-full h-[1px] bg-[var(--border-color)] my-6"></div>
+
+        <!-- Pop-ups & Modals -->
+        <!-- Emoji Selector Modal -->
+        <div id="emoji-modal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-[var(--bg-card)] p-6 rounded-2xl max-w-sm w-full border border-[var(--border-color)] glow-soft">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-lg">Pick an Icon</h3>
+              <button onclick="closeEmojiSelector()" class="text-[var(--text-muted)] hover:text-red-500"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="grid grid-cols-5 gap-3 text-3xl p-2 justify-items-center">
+              <button onclick="setEmoji('☕')" class="hover:scale-125 transition-transform p-1">☕</button>
+              <button onclick="setEmoji('🧸')" class="hover:scale-125 transition-transform p-1">🧸</button>
+              <button onclick="setEmoji('🥞')" class="hover:scale-125 transition-transform p-1">🥞</button>
+              <button onclick="setEmoji('🥐')" class="hover:scale-125 transition-transform p-1">🥐</button>
+              <button onclick="setEmoji('🌱')" class="hover:scale-125 transition-transform p-1">🌱</button>
+              <button onclick="setEmoji('📖')" class="hover:scale-125 transition-transform p-1">📖</button>
+              <button onclick="setEmoji('💡')" class="hover:scale-125 transition-transform p-1">💡</button>
+              <button onclick="setEmoji('☁️')" class="hover:scale-125 transition-transform p-1">☁️</button>
+              <button onclick="setEmoji('🕯️')" class="hover:scale-125 transition-transform p-1">🕯️</button>
+              <button onclick="setEmoji('🏡')" class="hover:scale-125 transition-transform p-1">🏡</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cover Selector Modal -->
+        <div id="cover-modal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div class="bg-[var(--bg-card)] p-6 rounded-2xl max-w-md w-full border border-[var(--border-color)] glow-soft">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="font-bold text-lg">Choose Space Cover</h3>
+              <button onclick="closeCoverSelector()" class="text-[var(--text-muted)] hover:text-red-500"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <button onclick="setCover('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=1600')" class="h-20 rounded-lg overflow-hidden border-2 border-transparent hover:border-[var(--accent)]">
+                <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=300" class="w-full h-full object-cover">
+              </button>
+              <button onclick="setCover('https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1600')" class="h-20 rounded-lg overflow-hidden border-2 border-transparent hover:border-[var(--accent)]">
+                <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=300" class="w-full h-full object-cover">
+              </button>
+              <button onclick="setCover('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1600')" class="h-20 rounded-lg overflow-hidden border-2 border-transparent hover:border-[var(--accent)]">
+                <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=300" class="w-full h-full object-cover">
+              </button>
+              <button onclick="setCover('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1600')" class="h-20 rounded-lg overflow-hidden border-2 border-transparent hover:border-[var(--accent)]">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=300" class="w-full h-full object-cover">
+              </button>
+            </div>
+            <div class="flex space-x-2">
+              <input id="custom-cover-url" type="text" placeholder="Paste custom image URL..." class="flex-1 bg-[var(--bg-main)] text-sm px-3 py-2 rounded-lg border border-[var(--border-color)] outline-none focus:border-[var(--accent)]">
+              <button onclick="setCustomCover()" class="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white text-sm px-4 py-2 rounded-lg">Apply</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN TABS CONTENT -->
+        
+        <!-- ================= TAB 1: COZY CAFE HUB (DASHBOARD) ================= -->
+        <section id="tab-dashboard-content" class="tab-content block space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Left & Middle: Routine & Priorities -->
+            <div class="md:col-span-2 space-y-6">
+              
+              <!-- Greeting / Quick Affirmation -->
+              <div class="p-6 rounded-2xl bg-[var(--accent-light)] border border-[var(--border-color)] relative overflow-hidden">
+                <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-y-6 translate-x-6">
+                  <i data-lucide="coffee" class="w-48 h-48"></i>
+                </div>
+                <h3 class="font-serif text-2xl font-bold mb-1">Morning coffee is brewing... ☕</h3>
+                <p class="text-sm text-[var(--accent-dark)] italic">“Grab a warm cup of coffee and take today one cozy step at a time.”</p>
+              </div>
+
+              <!-- Sweet Three Priorities -->
+              <div class="p-6 rounded-2xl notion-card glow-soft">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-lg">🧁</span>
+                    <h3 class="font-bold text-base">Today's Sweet Three Priorities</h3>
+                  </div>
+                  <span class="text-xs text-[var(--text-muted)] font-medium">Focus is productivity</span>
+                </div>
+                
+                <div class="space-y-3" id="sweet-three-container">
+                  <!-- JS Rendered priorities -->
+                </div>
+
+                <div class="mt-4 flex space-x-2">
+                  <input id="new-priority-input" type="text" placeholder="Add a new goal..." class="flex-1 bg-[var(--bg-main)] text-sm px-3 py-2 rounded-lg border border-[var(--border-color)] outline-none focus:border-[var(--accent)]">
+                  <button onclick="addTask('priority')" class="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white text-xs px-3.5 py-2 rounded-lg flex items-center space-x-1.5 font-medium">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Add</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Daily Routine Checklist -->
+              <div class="p-6 rounded-2xl notion-card glow-soft">
+                <div class="flex items-center justify-between mb-4">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-lg">☁️</span>
+                    <h3 class="font-bold text-base">Cozy Daily Routine</h3>
+                  </div>
+                  <button onclick="resetRoutines()" class="text-xs text-[var(--accent-dark)] hover:underline flex items-center space-x-1">
+                    <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+                    <span>Reset Tasks</span>
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="routines-container">
+                  <!-- Routine items dynamically rendered -->
+                </div>
+                
+                <div class="mt-4 flex space-x-2 border-t border-[var(--border-color)] pt-4">
+                  <input id="new-routine-input" type="text" placeholder="Add custom routine..." class="flex-1 bg-[var(--bg-main)] text-sm px-3 py-2 rounded-lg border border-[var(--border-color)] outline-none focus:border-[var(--accent)]">
+                  <button onclick="addTask('routine')" class="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white text-xs px-3.5 py-2 rounded-lg flex items-center space-x-1.5 font-medium">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Add</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right Column: Quick Capture & Vibe Sync -->
+            <div class="space-y-6">
+              
+              <!-- Current Vibes Card -->
+              <div class="p-5 rounded-2xl bg-[var(--accent-light)] border border-[var(--border-color)] text-sm">
+                <div class="flex items-center space-x-2 mb-3">
+                  <span class="text-base">🥐</span>
+                  <h4 class="font-bold">Current Vibe Checklist</h4>
+                </div>
+                <div class="space-y-2">
+                  <div class="flex justify-between items-center py-1">
+                    <span class="text-[var(--text-muted)] text-xs">Aesthetic Aura</span>
+                    <select id="vibe-mood" onchange="saveVibe()" class="bg-white border border-[var(--border-color)] rounded px-1.5 py-0.5 text-xs text-[var(--text-main)] outline-none">
+                      <option value="🧸 Soft & Cozy">🧸 Soft & Cozy</option>
+                      <option value="📚 Study focus">📚 Study focus</option>
+                      <option value="🌧️ Rain outside">🌧️ Rain outside</option>
+                      <option value="✨ Warm & creative">✨ Warm & creative</option>
+                    </select>
+                  </div>
+                  <div class="flex justify-between items-center py-1">
+                    <span class="text-[var(--text-muted)] text-xs">Focus Companion</span>
+                    <span class="text-xs font-semibold badge-pastel px-2 py-0.5 rounded-full">Cappuccino Bear</span>
+                  </div>
+                  <div class="flex justify-between items-center py-1">
+                    <span class="text-[var(--text-muted)] text-xs">Self Care Stage</span>
+                    <span class="text-xs font-semibold badge-pastel px-2 py-0.5 rounded-full">Hydrated 💧</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sticky Note Quick Capture -->
+              <div class="p-5 rounded-2xl bg-[#fefae0] text-amber-900 shadow-sm border border-amber-200/50 relative transform rotate-1">
+                <div class="absolute top-2 right-2 flex space-x-1">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-300"></span>
+                </div>
+                <div class="flex items-center space-x-1 mb-2 text-xs font-bold uppercase tracking-wider text-amber-800">
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                  <span>Aesthetic Sticky Note</span>
+                </div>
+                <textarea id="quick-sticky" oninput="saveQuickSticky()" class="w-full h-36 bg-transparent resize-none border-none outline-none text-sm leading-relaxed text-amber-950" placeholder="Drop matching lofi lyrics, reminders or simple quotes here..."></textarea>
+                <div class="text-[10px] text-amber-700/80 text-right mt-1 font-mono">Autosaved</div>
+              </div>
+
+              <!-- Tiny Pomodoro Timer for Work sessions -->
+              <div class="p-5 rounded-2xl notion-card glow-soft">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-bold text-[var(--accent-dark)] uppercase">Cozy Pomodoro</span>
+                  <div class="flex space-x-1">
+                    <span class="w-2 h-2 rounded-full bg-[var(--accent)]"></span>
+                  </div>
+                </div>
+                <div class="text-center py-2">
+                  <span id="timer-display" class="font-mono text-3xl font-bold text-[var(--text-main)]">25:00</span>
+                  <div class="flex justify-center space-x-3 mt-3">
+                    <button id="pomo-play" onclick="togglePomodoro()" class="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white text-xs px-3 py-1 rounded-full transition-colors">Start</button>
+                    <button onclick="resetPomodoro()" class="bg-[var(--bg-main)] text-[var(--text-main)] hover:bg-[var(--border-color)] text-xs px-3 py-1 rounded-full transition-colors border border-[var(--border-color)]">Reset</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 2: HONEY HABIT TRACKER ================= -->
+        <section id="tab-habits-content" class="tab-content hidden space-y-6 animate-fade-in">
+          <div class="p-6 rounded-2xl bg-[var(--accent-light)] border border-[var(--border-color)]">
+            <h3 class="font-serif text-2xl font-bold mb-1 text-[var(--accent-dark)]">Weekly Honeycomb Habit Tracker</h3>
+            <p class="text-sm text-[var(--text-muted)]">Check off your habits daily. Reach consecutive daily streaks for positive affirmation!</p>
+          </div>
+
+          <div class="p-6 rounded-2xl notion-card glow-soft">
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+              <h4 class="font-bold text-lg flex items-center space-x-2">
+                <span>🍯</span>
+                <span>Active Habits</span>
+              </h4>
+              <div class="flex space-x-2">
+                <input id="new-habit-input" type="text" placeholder="e.g. Meditate for 10 min" class="bg-[var(--bg-main)] text-sm px-3 py-2 rounded-lg border border-[var(--border-color)] outline-none focus:border-[var(--accent)]">
+                <button onclick="addNewHabit()" class="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white text-xs px-4 py-2 rounded-lg font-medium">Add Habit</button>
+              </div>
+            </div>
+
+            <div class="space-y-4" id="habits-list-container">
+              <!-- JS Rendered habits table/grid -->
+            </div>
+          </div>
+
+          <!-- Sweet Habit Tips card -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-5 rounded-2xl bg-teal-50 border border-teal-100/50 text-teal-900">
+              <h5 class="font-bold text-sm flex items-center space-x-1.5 mb-2">
+                <i data-lucide="sparkles" class="w-4 h-4 text-teal-600"></i>
+                <span>Habit Stacking Tip</span>
+              </h5>
+              <p class="text-xs leading-relaxed text-teal-800">After my morning coffee brew, I will spend 10 minutes planning out my sweet three goals. Sticking with simple queues leads to permanent routines.</p>
+            </div>
+            <div class="p-5 rounded-2xl bg-purple-50 border border-purple-100/50 text-purple-900">
+              <h5 class="font-bold text-sm flex items-center space-x-1.5 mb-2">
+                <i data-lucide="flower" class="w-4 h-4 text-purple-600"></i>
+                <span>Mental Care Checklist</span>
+              </h5>
+              <p class="text-xs leading-relaxed text-purple-800">Completing even a single habit during hard periods is beautiful work. Be gentle on yourself when your honey jar needs a rest and refill.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 3: COZY LIBRARY LOG ================= -->
+        <section id="tab-reading-content" class="tab-content hidden space-y-6">
+          <div class="p-6 rounded-2xl bg-[var(--accent-light)] border border-[var(--border-color)] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h3 class="font-serif text-2xl font-bold mb-1 text-[var(--accent-dark)]">Your Reading Log Shelf</h3>
+              <p class="text-sm text-[var(--text-muted)]">Track what books you are currently devouring alongside your warm beverages.</p>
+            </div>
+            <button onclick="openBookModal()" class="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white text-xs px-4 py-2 rounded-lg font-medium flex items-center space-x-1.5 shadow-sm">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i>
+              <span>Add New Book</span>
+            </button>
+          </div>
+
+          <!-- Filters Bar -->
+          <div class="flex space-x-2 border-b border-[var(--border-color)] pb-3">
+            <button onclick="filterBooks('All')" id="book-filter-All" class="book-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold badge-pastel transition-colors">All Reads</button>
+            <button onclick="filterBooks('Reading')" id="book-filter-Reading" class="book-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:bg-[var(--accent-light)] transition-colors">Reading</button>
+            <button onclick="filterBooks('To Read')" id="book-filter-ToRead" class="book-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:bg-[var(--accent-light)] transition-colors">Want to Read</button>
+            <button onclick="filterBooks('Completed')" id="book-filter-Completed" class="book-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:bg-[var(--accent-light)] transition-colors">Completed</button>
+          </div>
+
+          <!-- Library Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="library-container">
+            <!-- Books dynamically injected here -->
+          </div>
+
+          <!-- Add Book Modal -->
+          <div id="book-modal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-[var(--bg-card)] p-6 rounded-2xl max-w-md w-full border border-[var(--border-color)] glow-soft">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg">Add Book to Shelf</h3>
+                <button onclick="closeBookModal()" class="text-[var(--text-muted)] hover:text-red-500"><i data-lucide="x" class="w-5 h-5"></i></button>
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-bold text-[var(--text-muted)] mb-1">Book Title</label>
+                  <input id="book-title-input" type="text" placeholder="e.g. Kiki's Delivery Service" class="w-full bg-[var(--bg-main)] text-sm px-3 py-2 rounded-lg border border-[var(--border-color)] outline-none focus:border-[var(--accent)]">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[var(--text-muted)] mb-1">Author</label>
+                  <input id="book-author-input" type="text" placeholder="e.g. Eiko Kadono" class="w-full bg-[var(--bg-main)] text-sm px-3 py-2 rounded-lg border border-[var(--border-color)] outline-none focus:border-[var(--accent)]">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-bold text-[var(--text-muted)] mb-1">Status</label>
+                    <select id="book-status-select" class="w-full bg-[var(--bg-main)] text-sm px-3 py-2 rounded-lg border border-[var(--border-color)] outline-none focus:border-[var(--accent)]">
+                      <option value="Reading">Reading</option>
+                      <option value="To Read">Want to Read</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-[var(--text-muted)] mb-1">Color Palette</label>
+                    <select id="book-color-select" class="w-full bg-[var(--bg-main)] text-sm px-3 py-2 rounded-lg border border-[var(--border-color)] outline-none focus:border-[var(--accent)]">
+                      <option value="rose">Soft Rose</option>
+                      <option value="sage">Matcha Sage</option>
+                      <option value="lavender">Lilac Lavender</option>
+                      <option value="amber">Warm Caramel</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-bold text-[var(--text-muted)] mb-1">Total Pages</label>
+                    <input id="book-pages-input" type="number" value="250" class="w-full bg-[var(--bg-main)] text-sm px-3 py-2 rounded-lg border border-[var(--border-color)] outline-none focus:border-[var(--accent)]">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-[var(--text-muted)] mb-1">Pages Read</label>
+                    <input id="book-read-input" type="number" value="0" class="w-full bg-[var(--bg-main)] text-sm px-3 py-2 rounded-lg border border-[var(--border-color)] outline-none focus:border-[var(--accent)]">
+                  </div>
+                </div>
+                <button onclick="saveNewBook()" class="w-full bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white text-sm py-2.5 rounded-lg font-bold">Inscribe to Shelf</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 4: CREATIVE STICKY NOTES ================= -->
+        <section id="tab-notes-content" class="tab-content hidden space-y-6">
+          <div class="p-6 rounded-2xl bg-[var(--accent-light)] border border-[var(--border-color)] flex justify-between items-center">
+            <div>
+              <h3 class="font-serif text-2xl font-bold mb-1 text-[var(--accent-dark)]">Creative Sticky Notes Board</h3>
+              <p class="text-sm text-[var(--text-muted)]">Pin random brainstorms, quotes, or study details on colored slips.</p>
+            </div>
+            <button onclick="addNewNote()" class="bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white text-xs px-4 py-2 rounded-lg font-medium flex items-center space-x-1">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Pin New Note</span>
+            </button>
+          </div>
+
+          <!-- Grid of sticky notes -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6" id="sticky-notes-grid">
+            <!-- Dynamic sticky notes injection -->
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // State Variables for Interactive Session (Stored dynamically/local fallback)
+    let state = {
+      title: "Cozy Cafe Workspace",
+      emoji: "☕",
+      cover: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=1600",
+      theme: "cafe",
+      activeTab: "dashboard",
+      vibe: "🧸 Soft & Cozy",
+      quickSticky: "",
+      todos: [
+        { id: 1, text: "Finish lesson outline", completed: false, section: "priority" },
+        { id: 2, text: "Read 2 chapters of Kiki", completed: true, section: "priority" },
+        { id: 3, text: "Organize Notion resources", completed: false, section: "priority" },
+        { id: 4, text: "Morning stretch & hydrate 💧", completed: true, section: "routine" },
+        { id: 5, text: "Review today's schedule 🗓️", completed: false, section: "routine" },
+        { id: 6, text: "15-minute tidy up 🧺", completed: false, section: "routine" },
+        { id: 7, text: "Evening wind-down yoga 🌙", completed: false, section: "routine" }
+      ],
+      habits: [
+        { id: 1, name: "Stretch & Hydrate", icon: "💧", streak: 5, history: { Mon: true, Tue: true, Wed: true, Thu: false, Fri: true, Sat: false, Sun: false } },
+        { id: 2, name: "30-min Reading", icon: "📚", streak: 2, history: { Mon: false, Tue: true, Wed: true, Thu: false, Fri: false, Sat: false, Sun: false } },
+        { id: 3, name: "Meditation / Quiet Time", icon: "🧘", streak: 0, history: { Mon: false, Tue: false, Wed: false, Thu: false, Fri: false, Sat: false, Sun: false } }
+      ],
+      books: [
+        { id: 1, title: "Kiki's Delivery Service", author: "Eiko Kadono", status: "Reading", palette: "amber", pages: 250, read: 120, rating: 4 },
+        { id: 2, title: "The Wind-Up Bird Chronicle", author: "Haruki Murakami", status: "To Read", palette: "sage", pages: 600, read: 0, rating: 0 },
+        { id: 3, title: "Before the Coffee Gets Cold", author: "Toshikazu Kawaguchi", status: "Completed", palette: "rose", pages: 213, read: 213, rating: 5 }
+      ],
+      notes: [
+        { id: 1, content: "Lo-fi beats study playlist recommendation: Tokyo Dream Cafe vibes.", color: "yellow" },
+        { id: 2, content: "Grocery shopping list: Oat milk, chamomile tea bags, cinnamon sticks, mini croissants.", color: "pink" },
+        { id: 3, content: "🌸 Quote: 'Quiet people have the loudest minds.' Let the ideas flow without rush.", color: "green" }
+      ]
+    };
+
+    // Load State from LocalStorage if available
+    function loadState() {
+      const savedState = localStorage.getItem("cozy_notion_state_v1");
+      if (savedState) {
+        state = JSON.parse(savedState);
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem("cozy_notion_state_v1", JSON.stringify(state));
+    }
+
+    // Audio Playback
+    let musicPlaying = false;
+    const audio = document.getElementById('ambient-audio');
+    
+    function toggleMusic() {
+      musicPlaying = !musicPlaying;
+      const playIcon = document.getElementById('play-icon');
+      const musicIndicator = document.getElementById('music-indicator');
+      
+      if (musicPlaying) {
+        audio.play().catch(e => {
+          console.log("Audio play deferred for user click constraint", e);
+        });
+        playIcon.setAttribute('data-lucide', 'pause');
+        musicIndicator.classList.remove('hidden');
+      } else {
+        audio.pause();
+        playIcon.setAttribute('data-lucide', 'play');
+        musicIndicator.classList.add('hidden');
+      }
+      lucide.createIcons();
+    }
+
+    // Pomodoro Timer Logic
+    let pomoSeconds = 25 * 60;
+    let pomoInterval = null;
+    let pomoRunning = false;
+
+    function togglePomodoro() {
+      const playBtn = document.getElementById('pomo-play');
+      if (pomoRunning) {
+        clearInterval(pomoInterval);
+        pomoRunning = false;
+        playBtn.innerText = "Start";
+        playBtn.className = "bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white text-xs px-3 py-1 rounded-full transition-colors";
+      } else {
+        pomoRunning = true;
+        playBtn.innerText = "Pause";
+        playBtn.className = "bg-red-400 hover:bg-red-500 text-white text-xs px-3 py-1 rounded-full transition-colors";
+        pomoInterval = setInterval(() => {
+          pomoSeconds--;
+          updateTimerDisplay();
+          if (pomoSeconds <= 0) {
+            clearInterval(pomoInterval);
+            triggerConfetti();
+            pomoSeconds = 25 * 60;
+            pomoRunning = false;
+            playBtn.innerText = "Restart";
+            updateTimerDisplay();
+          }
+        }, 1000);
+      }
+    }
+
+    function resetPomodoro() {
+      clearInterval(pomoInterval);
+      pomoRunning = false;
+      pomoSeconds = 25 * 60;
+      updateTimerDisplay();
+      const playBtn = document.getElementById('pomo-play');
+      playBtn.innerText = "Start";
+      playBtn.className = "bg-[var(--accent)] hover:bg-[var(--accent-dark)] text-white text-xs px-3 py-1 rounded-full transition-colors";
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(pomoSeconds / 60);
+      const seconds = pomoSeconds % 60;
+      document.getElementById('timer-display').innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // Tab switcher
+    function switchTab(tabName) {
+      state.activeTab = tabName;
+      saveState();
+
+      // Update Nav Buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.add('text-[var(--text-muted)]');
+        btn.classList.remove('badge-pastel', 'text-[var(--text-main)]');
+      });
+      const activeNav = document.getElementById(`nav-${tabName}`);
+      if (activeNav) {
+        activeNav.classList.remove('text-[var(--text-muted)]');
+        activeNav.classList.add('badge-pastel', 'text-[var(--text-main)]');
+      }
+
+      // Hide/Show Pages
+      document.querySelectorAll('.tab-content').forEach(section => {
+        section.classList.add('hidden');
+      });
+      document.getElementById(`tab-${tabName}-content`).classList.remove('hidden');
+
+      // Refresh corresponding sections if loaded dynamic content
+      if (tabName === 'dashboard') {
+        renderTodos();
+      } else if (tabName === 'habits') {
+        renderHabits();
+      } else if (tabName === 'reading') {
+        renderBooks();
+      } else if (tabName === 'notes') {
+        renderNotes();
+      }
+    }
+
+    // Set and save styling themes
+    function setTheme(themeName) {
+      const body = document.body;
+      body.className = body.className.replace(/theme-\S+/g, '');
+      body.classList.add(`theme-${themeName}`);
+      state.theme = themeName;
+      saveState();
+    }
+
+    // Cover Page Management
+    function openCoverSelector() {
+      document.getElementById('cover-modal').classList.remove('hidden');
+    }
+    function closeCoverSelector() {
+      document.getElementById('cover-modal').classList.add('hidden');
+    }
+    function setCover(url) {
+      state.cover = url;
+      document.getElementById('cover-image').src = url;
+      saveState();
+      closeCoverSelector();
+    }
+    function setCustomCover() {
+      const url = document.getElementById('custom-cover-url').value;
+      if (url.trim()) {
+        setCover(url);
+      }
+    }
+
+    // Icon/Emoji Change Selector
+    function openEmojiSelector() {
+      document.getElementById('emoji-modal').classList.remove('hidden');
+    }
+    function closeEmojiSelector() {
+      document.getElementById('emoji-modal').classList.add('hidden');
+    }
+    function setEmoji(emoji) {
+      state.emoji = emoji;
+      document.getElementById('current-emoji').innerText = emoji;
+      saveState();
+      closeEmojiSelector();
+    }
+
+    // Page Title Edit Trigger
+    function focusPageTitle() {
+      const pTitle = document.getElementById('page-title');
+      pTitle.focus();
+    }
+    function savePageTitle() {
+      const pTitle = document.getElementById('page-title');
+      state.title = pTitle.innerText.trim() || "Cozy Cafe Workspace";
+      pTitle.innerText = state.title;
+      saveState();
+    }
+
+    // Quick Vibe Select Save
+    function saveVibe() {
+      state.vibe = document.getElementById('vibe-mood').value;
+      saveState();
+    }
+
+    // Quick Sticky Text Autosaver
+    function saveQuickSticky() {
+      state.quickSticky = document.getElementById('quick-sticky').value;
+      saveState();
+    }
+
+    // Renders list tasks inside Dashboard
+    function renderTodos() {
+      // 1. Sweet Priorities
+      const sweetThree = state.todos.filter(t => t.section === 'priority');
+      const s3Container = document.getElementById('sweet-three-container');
+      s3Container.innerHTML = '';
+      
+      sweetThree.forEach(todo => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-main)] hover:shadow-sm transition-shadow';
+        div.innerHTML = `
+          <div class="flex items-center space-x-3 flex-1 min-w-0">
+            <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo(${todo.id})" class="w-4.5 h-4.5 rounded text-[var(--accent)] focus:ring-[var(--accent)] border-gray-300 cursor-pointer">
+            <span class="text-sm truncate ${todo.completed ? 'line-through text-[var(--text-muted)]' : ''}">${escapeHTML(todo.text)}</span>
+          </div>
+          <button onclick="deleteTodo(${todo.id})" class="text-[var(--text-muted)] hover:text-red-400 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+        `;
+        s3Container.appendChild(div);
+      });
+
+      // 2. Routines Tasks
+      const routines = state.todos.filter(t => t.section === 'routine');
+      const rContainer = document.getElementById('routines-container');
+      rContainer.innerHTML = '';
+
+      routines.forEach(todo => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-main)] hover:shadow-sm transition-shadow';
+        div.innerHTML = `
+          <div class="flex items-center space-x-3 flex-1 min-w-0">
+            <input type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo(${todo.id})" class="w-4.5 h-4.5 rounded text-[var(--accent)] focus:ring-[var(--accent)] border-gray-300 cursor-pointer">
+            <span class="text-xs truncate ${todo.completed ? 'line-through text-[var(--text-muted)]' : ''}">${escapeHTML(todo.text)}</span>
+          </div>
+          <button onclick="deleteTodo(${todo.id})" class="text-[var(--text-muted)] hover:text-red-400 p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+        `;
+        rContainer.appendChild(div);
+      });
+
+      lucide.createIcons();
+    }
+
+    // Adds a task to either Sweet Priorities or Cozy Routine
+    function addTask(section) {
+      const inputId = section === 'priority' ? 'new-priority-input' : 'new-routine-input';
+      const input = document.getElementById(inputId);
+      const text = input.value.trim();
+
+      if (!text) return;
+
+      const newTodo = {
+        id: Date.now(),
+        text: text,
+        completed: false,
+        section: section
+      };
+
+      state.todos.push(newTodo);
+      saveState();
+      input.value = '';
+      renderTodos();
+    }
+
+    function toggleTodo(id) {
+      const todo = state.todos.find(t => t.id === id);
+      if (todo) {
+        todo.completed = !todo.completed;
+        if (todo.completed) {
+          triggerConfetti();
+        }
+        saveState();
+        renderTodos();
+      }
+    }
+
+    function deleteTodo(id) {
+      state.todos = state.todos.filter(t => t.id !== id);
+      saveState();
+      renderTodos();
+    }
+
+    function resetRoutines() {
+      state.todos.forEach(todo => {
+        if (todo.section === 'routine') {
+          todo.completed = false;
+        }
+      });
+      saveState();
+      renderTodos();
+    }
+
+    // ================== HABIT TRACKER TAB LOGIC ==================
+    const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    
+    function renderHabits() {
+      const container = document.getElementById('habits-list-container');
+      container.innerHTML = '';
+
+      state.habits.forEach(habit => {
+        const habitCard = document.createElement('div');
+        habitCard.className = 'p-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-main)] flex flex-col md:flex-row md:items-center justify-between gap-4';
+        
+        let daysHtml = '';
+        weekDays.forEach(day => {
+          const isDone = habit.history[day] || false;
+          daysHtml += `
+            <div class="flex flex-col items-center">
+              <span class="text-[10px] text-[var(--text-muted)] font-bold uppercase mb-1">${day}</span>
+              <button onclick="toggleHabitDay(${habit.id}, '${day}')" class="w-8 h-8 rounded-full flex items-center justify-center border transition-all ${
+                isDone 
+                  ? 'bg-[var(--accent)] border-[var(--accent)] text-white scale-105' 
+                  : 'bg-[var(--bg-card)] border-[var(--border-color)] hover:border-[var(--accent)]'
+              }">
+                ${isDone ? '🍯' : ''}
+              </button>
+            </div>
+          `;
+        });
+
+        habitCard.innerHTML = `
+          <div class="flex items-center justify-between md:justify-start space-x-3">
+            <div class="text-2xl">${habit.icon || '🍯'}</div>
+            <div>
+              <h5 class="font-bold text-sm text-[var(--text-main)]">${escapeHTML(habit.name)}</h5>
+              <p class="text-xs text-[var(--text-muted)]">Current Streak: <strong class="text-[var(--accent-dark)]">${habit.streak} days</strong></p>
+            </div>
+            <button onclick="deleteHabit(${habit.id})" class="text-[var(--text-muted)] hover:text-red-400 md:ml-4"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </div>
+          <div class="flex justify-between md:justify-end gap-2.5 flex-wrap">
+            ${daysHtml}
+          </div>
+        `;
+        container.appendChild(habitCard);
+      });
+      lucide.createIcons();
+    }
+
+    function toggleHabitDay(habitId, day) {
+      const habit = state.habits.find(h => h.id === habitId);
+      if (habit) {
+        const wasDone = habit.history[day] || false;
+        habit.history[day] = !wasDone;
+        
+        // Dynamic streak calculator based on contiguous past days (simplified mock)
+        if (habit.history[day]) {
+          habit.streak += 1;
+          triggerConfetti();
+        } else {
+          habit.streak = Math.max(0, habit.streak - 1);
+        }
+
+        saveState();
+        renderHabits();
+      }
+    }
+
+    function addNewHabit() {
+      const input = document.getElementById('new-habit-input');
+      const name = input.value.trim();
+      if (!name) return;
+
+      const icons = ['✨', '🍵', '📚', '🌱', '💧', '🧘'];
+      const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+
+      const newHabit = {
+        id: Date.now(),
+        name: name,
+        icon: randomIcon,
+        streak: 0,
+        history: { Mon: false, Tue: false, Wed: false, Thu: false, Fri: false, Sat: false, Sun: false }
+      };
+
+      state.habits.push(newHabit);
+      saveState();
+      input.value = '';
+      renderHabits();
+    }
+
+    function deleteHabit(id) {
+      state.habits = state.habits.filter(h => h.id !== id);
+      saveState();
+      renderHabits();
+    }
+
+    // ================== BOOK SHELF TAB LOGIC ==================
+    let bookFilter = 'All';
+
+    function renderBooks() {
+      const container = document.getElementById('library-container');
+      container.innerHTML = '';
+
+      const filtered = state.books.filter(b => {
+        if (bookFilter === 'All') return true;
+        return b.status === bookFilter;
+      });
+
+      filtered.forEach(book => {
+        const progressPercent = Math.min(100, Math.round((book.read / book.pages) * 100));
+        const colorClasses = getBookPalette(book.palette);
+
+        const card = document.createElement('div');
+        card.className = `notion-card rounded-2xl overflow-hidden p-5 flex flex-col justify-between glow-soft border border-[var(--border-color)]`;
+        
+        // Stars HTML
+        let starsHtml = '';
+        for (let i = 1; i <= 5; i++) {
+          starsHtml += `
+            <button onclick="rateBook(${book.id}, ${i})" class="focus:outline-none">
+              <i data-lucide="star" class="w-4 h-4 ${i <= book.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}"></i>
+            </button>
+          `;
+        }
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between mb-3">
+              <!-- Cute Book Cover Mini Vector representation -->
+              <div class="w-14 h-20 rounded shadow-sm flex flex-col justify-between p-1.5 text-[10px] text-white font-serif tracking-tight leading-none ${colorClasses.coverBg}">
+                <div class="font-bold border-b border-white/20 pb-1 truncate">${escapeHTML(book.title)}</div>
+                <div class="text-[8px] text-white/80 text-right truncate">${escapeHTML(book.author)}</div>
+              </div>
+              <div class="text-right">
+                <span class="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${colorClasses.badge}">
+                  ${book.status}
+                </span>
+                <div class="flex items-center space-x-0.5 mt-1">
+                  ${starsHtml}
+                </div>
+              </div>
+            </div>
+
+            <h4 class="font-serif font-bold text-base line-clamp-1 mb-1 text-[var(--text-main)]">${escapeHTML(book.title)}</h4>
+            <p class="text-xs text-[var(--text-muted)] mb-3">by ${escapeHTML(book.author)}</p>
+
+            <!-- Book page progress -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-[10px] text-[var(--text-muted)] font-semibold">
+                <span>Progress: ${progressPercent}%</span>
+                <span>${book.read}/${book.pages} pgs</span>
+              </div>
+              <div class="w-full bg-[var(--bg-main)] h-2 rounded-full overflow-hidden">
+                <div class="h-full rounded-full ${colorClasses.progressColor}" style="width: ${progressPercent}%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between border-t border-[var(--border-color)] pt-3 mt-4">
+            <div class="flex items-center space-x-1">
+              <button onclick="updatePageProgress(${book.id}, -10)" class="p-1 rounded bg-[var(--accent-light)] text-[var(--accent-dark)] hover:opacity-80">
+                <i data-lucide="minus" class="w-3 h-3"></i>
+              </button>
+              <button onclick="updatePageProgress(${book.id}, 10)" class="p-1 rounded bg-[var(--accent-light)] text-[var(--accent-dark)] hover:opacity-80">
+                <i data-lucide="plus" class="w-3 h-3"></i>
+              </button>
+            </div>
+            <button onclick="deleteBook(${book.id})" class="text-[var(--text-muted)] hover:text-red-400 p-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    function getBookPalette(palette) {
+      switch (palette) {
+        case 'rose':
+          return { coverBg: 'bg-gradient-to-br from-pink-300 to-rose-400', badge: 'bg-rose-100 text-rose-800', progressColor: 'bg-rose-400' };
+        case 'sage':
+          return { coverBg: 'bg-gradient-to-br from-emerald-300 to-teal-500', badge: 'bg-teal-100 text-teal-800', progressColor: 'bg-teal-400' };
+        case 'lavender':
+          return { coverBg: 'bg-gradient-to-br from-purple-300 to-indigo-400', badge: 'bg-purple-100 text-purple-800', progressColor: 'bg-indigo-400' };
+        default: // amber
+          return { coverBg: 'bg-gradient-to-br from-amber-300 to-amber-500', badge: 'bg-amber-100 text-amber-800', progressColor: 'bg-amber-400' };
+      }
+    }
+
+    function filterBooks(status) {
+      bookFilter = status;
+      document.querySelectorAll('.book-filter-btn').forEach(btn => {
+        btn.className = 'book-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:bg-[var(--accent-light)] transition-colors';
+      });
+      const activeBtn = document.getElementById(`book-filter-${status.replace(' ', '')}`);
+      if (activeBtn) {
+        activeBtn.className = 'book-filter-btn px-3 py-1.5 rounded-lg text-xs font-semibold badge-pastel transition-colors';
+      }
+      renderBooks();
+    }
+
+    function openBookModal() {
+      document.getElementById('book-modal').classList.remove('hidden');
+    }
+    function closeBookModal() {
+      document.getElementById('book-modal').classList.add('hidden');
+    }
+
+    function saveNewBook() {
+      const title = document.getElementById('book-title-input').value.trim();
+      const author = document.getElementById('book-author-input').value.trim();
+      const status = document.getElementById('book-status-select').value;
+      const palette = document.getElementById('book-color-select').value;
+      const pages = parseInt(document.getElementById('book-pages-input').value) || 200;
+      const read = parseInt(document.getElementById('book-read-input').value) || 0;
+
+      if (!title || !author) return;
+
+      const newBook = {
+        id: Date.now(),
+        title,
+        author,
+        status,
+        palette,
+        pages,
+        read: Math.min(pages, read),
+        rating: 0
+      };
+
+      state.books.push(newBook);
+      saveState();
+      closeBookModal();
+      renderBooks();
+
+      // Clear fields
+      document.getElementById('book-title-input').value = '';
+      document.getElementById('book-author-input').value = '';
+    }
+
+    function updatePageProgress(bookId, amount) {
+      const book = state.books.find(b => b.id === bookId);
+      if (book) {
+        book.read = Math.max(0, Math.min(book.pages, book.read + amount));
+        if (book.read === book.pages) {
+          book.status = 'Completed';
+          triggerConfetti();
+        }
+        saveState();
+        renderBooks();
+      }
+    }
+
+    function rateBook(bookId, stars) {
+      const book = state.books.find(b => b.id === bookId);
+      if (book) {
+        book.rating = stars;
+        saveState();
+        renderBooks();
+      }
+    }
+
+    function deleteBook(bookId) {
+      state.books = state.books.filter(b => b.id !== bookId);
+      saveState();
+      renderBooks();
+    }
+
+
+    // ================== STICKY NOTES TAB LOGIC ==================
+    const noteColors = {
+      yellow: 'bg-amber-100 text-amber-950 border-amber-200/60',
+      pink: 'bg-rose-100 text-rose-950 border-rose-200/60',
+      green: 'bg-emerald-100 text-emerald-950 border-emerald-200/60'
+    };
+
+    function renderNotes() {
+      const grid = document.getElementById('sticky-notes-grid');
+      grid.innerHTML = '';
+
+      state.notes.forEach(note => {
+        const colorClass = noteColors[note.color] || noteColors.yellow;
+
+        const noteCard = document.createElement('div');
+        noteCard.className = `p-5 rounded-2xl relative border ${colorClass} shadow-sm flex flex-col justify-between h-48 transition-all hover:rotate-0 duration-300`;
+        
+        // Small organic lean
+        const angle = (note.id % 4) - 2; // Lean between -2 and +1 degrees
+        noteCard.style.transform = `rotate(${angle}deg)`;
+
+        noteCard.innerHTML = `
+          <textarea oninput="updateNoteText(${note.id}, this.value)" class="bg-transparent resize-none border-none outline-none text-sm leading-relaxed h-full w-full w-full">${escapeHTML(note.content)}</textarea>
+          
+          <div class="flex items-center justify-between border-t border-black/5 pt-2 mt-2">
+            <div class="flex space-x-1.5">
+              <button onclick="changeNoteColor(${note.id}, 'yellow')" class="w-3.5 h-3.5 rounded-full bg-amber-200 border border-amber-300"></button>
+              <button onclick="changeNoteColor(${note.id}, 'pink')" class="w-3.5 h-3.5 rounded-full bg-rose-200 border border-rose-300"></button>
+              <button onclick="changeNoteColor(${note.id}, 'green')" class="w-3.5 h-3.5 rounded-full bg-emerald-200 border border-emerald-300"></button>
+            </div>
+            <button onclick="deleteNote(${note.id})" class="text-black/40 hover:text-red-500 p-0.5">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        `;
+        grid.appendChild(noteCard);
+      });
+
+      lucide.createIcons();
+    }
+
+    function addNewNote() {
+      const newNote = {
+        id: Date.now(),
+        content: "New sweet thought here...",
+        color: "yellow"
+      };
+      state.notes.push(newNote);
+      saveState();
+      renderNotes();
+    }
+
+    function updateNoteText(id, val) {
+      const note = state.notes.find(n => n.id === id);
+      if (note) {
+        note.content = val;
+        saveState();
+      }
+    }
+
+    function changeNoteColor(id, color) {
+      const note = state.notes.find(n => n.id === id);
+      if (note) {
+        note.color = color;
+        saveState();
+        renderNotes();
+      }
+    }
+
+    function deleteNote(id) {
+      state.notes = state.notes.filter(n => n.id !== id);
+      saveState();
+      renderNotes();
+    }
+
+
+    // ================== HELPER / DECORATIVE UTILITIES ==================
+    
+    // Confetti celebration pop
+    function triggerConfetti() {
+      const canvas = document.getElementById('confetti');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      let particles = [];
+      const colors = ['#e0a899', '#ccd5ae', '#d4a373', '#fefae0', '#e9edc9'];
+
+      for (let i = 0; i < 60; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 15,
+          vy: (Math.random() - 0.5) * 15 - 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          size: Math.random() * 6 + 4,
+          life: 1.0
+        });
+      }
+
+      function update() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.25; // gravity
+          p.life -= 0.02;
+          
+          if (p.life > 0) {
+            alive = true;
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+
+        if (alive) {
+          requestAnimationFrame(update);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      update();
+    }
+
+    // Protection helper
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+
+    // Initialize Page on DOM Loaded
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+
+      // Apply saved attributes
+      document.body.className = `theme-${state.theme} font-sans overflow-x-hidden min-h-screen pb-12`;
+      document.getElementById('current-emoji').innerText = state.emoji;
+      document.getElementById('cover-image').src = state.cover;
+      document.getElementById('page-title').innerText = state.title;
+      document.getElementById('quick-sticky').value = state.quickSticky;
+      
+      // Update sidebar view match
+      switchTab(state.activeTab);
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
